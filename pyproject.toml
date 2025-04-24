@@ -1,6 +1,6 @@
 [project]
 name = "newsagg"
-version = "0.2.0"
+version = "0.3.0"
 description = "A multi-source news aggregator with a REST API"
 authors = [
     { name="Igor Paim", email="igorpaim8@gmail.com" }
