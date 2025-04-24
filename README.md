@@ -44,5 +44,6 @@
 |--------|-------|-------------|
 | GET    | `/articles` | Get all aggregated articles |
 | GET    | `/articles?source=g1` | Filter by source |
+| GET    | `/articles?source=g1&source=reddit:worldnews` | Filter by multiple sources |
 | GET    | `/topics/trending` | Group articles by topic |
 | POST   | `/rankings/strategy` | Set current ranking strategy |

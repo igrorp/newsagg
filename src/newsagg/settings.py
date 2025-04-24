@@ -1,3 +1,5 @@
+DFT_SOURCES = ["g1", "nyt", "folha", "reddit:worldnews"]
+
 ## SOURCES URLS
 
 # BRAZILIAN SOURCES
