@@ -1,6 +1,6 @@
 [project]
 name = "newsagg"
-version = "0.1.0"
+version = "0.2.0"
 description = "A multi-source news aggregator with a REST API"
 authors = [
     { name="Igor Paim", email="igorpaim8@gmail.com" }
@@ -35,6 +35,14 @@ package-dir = {"" = "src"}
 [tool.setuptools.packages.find]
 where = ["src"]
 
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+tag_format = "$version"
+version_scheme = "semver2"
+version_provider = "pep621"
+update_changelog_on_bump = true
+major_version_zero = true
 [build-system]
 requires = ["setuptools>=67.0", "wheel"]
 build-backend = "setuptools.build_meta"
