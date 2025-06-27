@@ -47,3 +47,13 @@
 | GET    | `/articles?source=g1&source=reddit:worldnews` | Filter by multiple sources |
 | GET    | `/topics/trending` | Group articles by topic |
 | POST   | `/rankings/strategy` | Set current ranking strategy |
+
+
+## 🐋 Docker image
+
+You can build a Docker image and run a local server. On the repository folder, run:
+
+```bash
+docker build -t newsagg-api .
+docker run -p 8000:8000 newsagg-api
+```
