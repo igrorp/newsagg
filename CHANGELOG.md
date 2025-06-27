@@ -1,3 +1,9 @@
+## 0.5.0 (2025-06-26)
+
+### Feat
+
+- **dockerfile**: add a dockerfile image
+
 ## 0.4.0 (2025-04-29)
 
 ### Feat
