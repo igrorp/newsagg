@@ -1,3 +1,9 @@
+## 0.6.0 (2025-07-09)
+
+### Feat
+
+- **database**: add the database and apply the repository pattern
+
 ## 0.5.0 (2025-06-26)
 
 ### Feat
