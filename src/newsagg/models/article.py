@@ -10,3 +10,11 @@ class Article(BaseModel):
     source: str
     summary: str | None = None
     retrievedAt: datetime
+
+    class Config:
+        orm_mode = True
+        allow_population_by_field_name = True
+        fields = {
+            "publishedAt": "published_at",
+            "retrievedAt": "retrieved_at",
+        }
