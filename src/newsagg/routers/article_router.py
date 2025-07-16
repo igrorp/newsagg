@@ -4,40 +4,45 @@ from fastapi import APIRouter
 
 from newsagg.config.database import SessionDep
 from newsagg.models.article import Article
-from newsagg.repositories.article import ArticleRepository
+from newsagg.services.article_service import ArticleService
+from newsagg.services.auth_service import UserAuthDep
 
-router = APIRouter(prefix="/articles")
+router = APIRouter(prefix="/article")
 
 
 @router.get("")
 async def get_all_articles(session: SessionDep) -> List[Article]:
-    _service = ArticleRepository(session=session)
-    return await _service.get_all_articles()
+    _service = ArticleService(session=session)
+    return await _service.get_all()
 
 
 @router.get("/{article_id}/")
 async def get_article_by_id(
     session: SessionDep, article_id: int
 ) -> Optional[Article]:
-    _service = ArticleRepository(session=session)
-    return await _service.get_article_by_id(article_id=article_id)
+    _service = ArticleService(session=session)
+    return await _service.get_by_id(_id=article_id)
 
 
 @router.post("")
-async def create_article(session: SessionDep, article: Article) -> Article:
-    _service = ArticleRepository(session=session)
-    return await _service.create_article(article=article)
+async def create_article(
+    session: SessionDep, article: Article, user: UserAuthDep
+) -> Article:
+    _service = ArticleService(session=session)
+    return await _service.create(data=article, user=user)
 
 
 @router.put("/{article_id}/")
 async def update_article(
-    session: SessionDep, article_id: int, article: Article
+    session: SessionDep, article_id: int, article: Article, user: UserAuthDep
 ) -> Optional[Article]:
-    _service = ArticleRepository(session=session)
-    return await _service.update_article(article=article, article_id=article_id)
+    _service = ArticleService(session=session)
+    return await _service.update(data=article, _id=article_id, user=user)
 
 
 @router.delete("/{article_id}")
-async def delete_article(session: SessionDep, article_id: int) -> bool:
-    _service = ArticleRepository(session=session)
-    return await _service.delete_article(article_id=article_id)
+async def delete_article(
+    session: SessionDep, article_id: int, user: UserAuthDep
+) -> bool:
+    _service = ArticleService(session=session)
+    return await _service.delete(_id=article_id, user=user)
