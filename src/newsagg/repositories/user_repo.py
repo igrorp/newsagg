@@ -3,7 +3,7 @@ from sqlalchemy import select
 
 from newsagg.config.database import SessionDep
 from newsagg.models.user import User
-from newsagg.schemas.user import UserInput
+from newsagg.schemas.user import UserDB, UserInput
 
 
 class UserRepository:
@@ -32,7 +32,7 @@ class UserRepository:
         """
         return user.is_superuser
 
-    async def create(self, data: UserInput, hashed_password: str) -> User:
+    async def create(self, data: UserInput, hashed_password: str) -> UserDB:
         """
         Create a new user.
 
@@ -81,7 +81,7 @@ class UserRepository:
         result = await self.session.execute(statement=statement)
         return result.scalar_one_or_none() is not None
 
-    async def get_user_by_email(self, email: str):
+    async def get_user_by_email(self, email: str) -> UserDB:
         """
         Get a user by email.
 
@@ -96,7 +96,7 @@ class UserRepository:
         )
         return result.scalar_one_or_none()
 
-    async def get_user_by_username(self, username: str) -> User:
+    async def get_user_by_username(self, username: str) -> UserDB:
         """
         Get a user by username.
 
@@ -110,7 +110,7 @@ class UserRepository:
         result = await self.session.execute(statement=statement)
         return result.scalar_one_or_none()
 
-    async def get_user_object_by_id(self, _id: UUID4) -> User:
+    async def get_user_object_by_id(self, _id: UUID4) -> UserDB:
         """
         Get a user object by ID.
 

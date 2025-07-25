@@ -1,4 +1,21 @@
-from fastapi import HTTPException
+from fastapi import HTTPException, status
+
+
+class TokenValidationError(HTTPException):
+    """
+    Exception raised when token validation fails.
+    """
+
+    ERROR_MSG = "Could not validate credentials"
+    STATUS_CODE = status.HTTP_401_UNAUTHORIZED
+    HEADERS = {"WWW-Authenticate": "Bearer"}
+
+    def __init__(self):
+        super().__init__(
+            status_code=self.STATUS_CODE,
+            detail=self.ERROR_MSG,
+            headers=self.HEADERS,
+        )
 
 
 class IncorretUsernameOrPasswordError(HTTPException):

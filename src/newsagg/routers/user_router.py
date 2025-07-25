@@ -1,5 +1,4 @@
-from fastapi import APIRouter, Depends
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi import APIRouter
 
 from newsagg.config.database import SessionDep
 from newsagg.schemas.user import UserInput
@@ -23,24 +22,6 @@ async def register(data: UserInput, session: SessionDep):
     """
     _service = UserService(session)
     return await _service.create(data)
-
-
-@router.post("/login", status_code=201)
-async def login(
-    session: SessionDep, data: OAuth2PasswordRequestForm = Depends()
-):
-    """
-    Login user.
-
-    Args:
-        data (OAuth2PasswordRequestForm): User credentials.
-        session (Session): Database session.
-
-    return awaits:
-        None
-    """
-    _service = UserService(session)
-    return await _service.login(data)
 
 
 @router.get("/me", status_code=200)

@@ -1,19 +1,14 @@
-from typing import Any, Dict
+from typing import ClassVar, Optional
 
-from fastapi import HTTPException
-from fastapi.security import OAuth2PasswordRequestForm
+from passlib.context import CryptContext
 from pydantic import UUID4
 
-from newsagg.auth.email_validation import validate_email
-from newsagg.auth.password_hashing import get_password_hash, pwd_context
-from newsagg.auth.password_validation import validate_password
-from newsagg.auth.token_encryption import create_access_token
 from newsagg.config.database import SessionDep
+from newsagg.models.user import User
 from newsagg.repositories.user_repo import UserRepository
 from newsagg.schemas.user import UserBase, UserInput
 from newsagg.services.exceptions import (
     EmailAlreadyExistsError,
-    IncorretUsernameOrPasswordError,
     UsernameAlreadyExistsError,
     UserNotFoundError,
 )
@@ -24,6 +19,10 @@ class UserService:
     Service class for handling user-related operations.
     """
 
+    PWD_CONTEXT: ClassVar[CryptContext] = CryptContext(
+        schemes=["bcrypt"], deprecated="auto"
+    )
+
     def __init__(self, session: SessionDep):
         """
         Initialize the service.
@@ -32,6 +31,28 @@ class UserService:
             session (Session): Database session.
         """
         self.repository = UserRepository(session)
+
+    def get_password_hash(self, password: str) -> str:
+        """Hash the password using bcrypt.
+
+        Args:
+            password (str): the password to hash.
+
+        Returns:
+            str: the hashed passoword.
+        """
+        return self.PWD_CONTEXT.hash(password)
+
+    def check_password(self, password: str, user: User) -> bool:
+        """Check if the provided password matches the hashed password.
+
+        Args:
+            password (str): the password to check.
+
+        Returns:
+            bool: True if the passwords match, False otherwise.
+        """
+        return self.PWD_CONTEXT.verify(password, user.hashed_password)
 
     async def create(self, data: UserInput) -> UserBase:
         """
@@ -48,35 +69,10 @@ class UserService:
         if await self.repository.user_exists_by_username(data.username):
             raise UsernameAlreadyExistsError
 
-        violations = validate_password(data.password)
-        if violations:
-            raise HTTPException(
-                status_code=400,
-                detail=[v.ERROR_MSG for v in violations],
-            )
-        validate_email(data.email)
-
-        hashed_password = get_password_hash(data.password)
+        hashed_password = self.get_password_hash(data.password)
         user = await self.repository.create(data, hashed_password)
+
         return UserBase(**user.__dict__)
-
-    async def login(self, data: OAuth2PasswordRequestForm) -> Dict[Any, Any]:
-        """
-        User login.
-
-        Args:
-            data (OAuth2PasswordRequestForm): Login form data.
-
-        Returns:
-            dict: Token response.
-        """
-        user = await self.repository.get_user_by_username(data.username)
-        if not user or not pwd_context.verify(
-            data.password, user.hashed_password
-        ):
-            raise IncorretUsernameOrPasswordError
-        access_token = create_access_token(data={"sub": user.username})
-        return {"access_token": access_token, "token_type": "bearer"}
 
     async def is_superuser(self, _id: UUID4) -> bool:
         """
@@ -110,3 +106,16 @@ class UserService:
         user = await self.repository.get_user_object_by_id(_id)
         await self.repository.delete_user(user)
         return True
+
+    async def get_user_by_username(self, username: str) -> Optional[User]:
+        """
+        Retrieve a user by username.
+
+        Args:
+            username (str): The username to search for.
+
+        Returns:
+            Optional[User]: The user object if found, None otherwise.
+        """
+        user = await self.repository.get_user_by_username(username)
+        return user
